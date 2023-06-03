@@ -1,16 +1,21 @@
 #! bin/python3
+import time
+
 from model.Compressor import Compressor
 from utilities.ImageReader import ImageReader
 import matplotlib.pyplot as plt
 
 
 def main():
-    img = ImageReader.read_image('./img/bridge.bmp')
-    # print(img.shape)
+    img = ImageReader.read_image('./img/deer.bmp')
+    print(img.shape)
     f = 500
-    d = 25
+    d = 100
     c = Compressor(img, f, d)
+    t0 = time.time()
     compressed = c.compress()
+    t1 = time.time()
+    print("TEMPO COMPRESSIONE: " + str(t1 - t0))
     fig, (ax1, ax2) = plt.subplots(1, 2)
     ax1.imshow(img, cmap=plt.get_cmap('gray'), vmin=0, vmax=255)
     ax1.set_title('Original')
