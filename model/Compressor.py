@@ -12,12 +12,14 @@ class Compressor:
         self.d = d
 
     def compress(self):
+        if self.d < 0 or self.d > 2 * self.f - 2:
+            raise Exception("Parametro d non valido")
         if len(self.img.shape) == 2:
             return self.compressGray()
-        r = self.img[:, :, 0]
-        g = self.img[:, :, 1]
-        b = self.img[:, :, 2]
-        if self.d <= self.f:
+        else:
+            r = self.img[:, :, 0]
+            g = self.img[:, :, 1]
+            b = self.img[:, :, 2]
             tmp = self.img
             self.img = r
             r = self.compressGray()
@@ -26,7 +28,7 @@ class Compressor:
             self.img = b
             b = self.compressGray()
             self.img = tmp
-        return np.stack((r, g, b), axis=2)
+            return np.stack((r, g, b), axis=2)
 
     def compressGray(self):
         rows_fill, columns_fill = self.fillDimensions()
@@ -68,10 +70,19 @@ class Compressor:
     def idct2(a):
         return idct(idct(a, axis=0, norm='ortho'), axis=1, norm='ortho')
 
-    def deleteFrequencies(self, block):
+    def deleteFrequencies2(self, block):
         block[:, self.d:self.f] = 0
         for i in range(self.d):
             block[self.d - i:self.f, i] = 0
+        return block
+
+    def deleteFrequencies(self, block):
+        v = np.arange(self.f)
+        v = v.reshape(self.f, 1)
+        a = np.zeros((self.f, self.f))
+        a = a + v
+        a = a + a.T
+        block[a >= self.d] = 0
         return block
 
     @staticmethod

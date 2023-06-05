@@ -2,6 +2,7 @@
 import time
 
 from model.Compressor import Compressor
+from ui.UserInterface import UserInterface
 from utilities.ImageReader import ImageReader
 import matplotlib.pyplot as plt
 
@@ -9,8 +10,8 @@ import matplotlib.pyplot as plt
 def main():
     img = ImageReader.read_image('./img/deer.bmp')
     print(img.shape)
-    f = 500
-    d = 100
+    f = 100
+    d = 60
     c = Compressor(img, f, d)
     t0 = time.time()
     compressed = c.compress()
@@ -27,4 +28,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    UserInterface().startUI()
+    #main()
+

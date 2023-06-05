@@ -2,7 +2,7 @@
 
 import numpy as np
 from numpy import float64
-from scipy.fftpack import dct, idct
+from scipy.fftpack import dct
 import time
 import matplotlib.pyplot as plt
 
