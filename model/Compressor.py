@@ -31,7 +31,7 @@ class Compressor:
             return np.stack((r, g, b), axis=2)
 
     def compressGray(self):
-        rows_fill, columns_fill = self.fillDimensions()
+        rows_deleted, columns_deleted = self.removePixels()
         img_size = self.img.shape
         result = np.zeros(img_size)
 
@@ -42,25 +42,21 @@ class Compressor:
                 result[i:(i + self.f), j:(j + self.f)] = self.idct2(result[i:(i + self.f), j:(j + self.f)])
                 result[i:(i + self.f), j:(j + self.f)] = self.fixValues(result[i:(i + self.f), j:(j + self.f)])
 
-        result = self.removeFilledPixels(result.astype(int), rows_fill, columns_fill)
+        result = self.fillPixels(result.astype(int), rows_deleted, columns_deleted)
         return result
 
-    def fillDimensions(self):
-        rows_to_fill = 0
-        col_to_fill = 0
+    def removePixels(self):
         height, width = self.img.shape
 
-        if height % self.f > 0:
-            rows_to_fill = self.f - height % self.f
-            last_pixels = self.img[-rows_to_fill:]
-            self.img = np.r_[self.img, last_pixels]
+        rows_deleted = height % self.f
+        columns_deleted = width % self.f
 
-        if width % self.f > 0:
-            col_to_fill = self.f - width % self.f
-            last_pixels = self.img[:, width - col_to_fill:width]
-            self.img = np.c_[self.img, last_pixels]
+        if rows_deleted > 0:
+            self.img = self.img[:-rows_deleted]
+        if columns_deleted > 0:
+            self.img = self.img[:, :-columns_deleted]
 
-        return rows_to_fill, col_to_fill
+        return rows_deleted, columns_deleted
 
     @staticmethod
     def dct2(a):
@@ -93,9 +89,17 @@ class Compressor:
         return block
 
     @staticmethod
-    def removeFilledPixels(matrix, rows_fill, columns_fill):
-        if rows_fill > 0:
-            matrix = matrix[:-rows_fill]
-        if columns_fill > 0:
-            matrix = matrix[:, :-columns_fill]
+    def fillPixels(matrix, rows_deleted, columns_deleted):
+        height, width = matrix.shape
+
+        if rows_deleted > 0:
+            row = matrix[-1:]
+            rows = np.tile(row, (rows_deleted, 1))
+            matrix = np.r_[matrix, rows]
+
+        if columns_deleted > 0:
+            column = matrix[:, width - 1:width]
+            columns = np.tile(column, (1, columns_deleted))
+            matrix = np.c_[matrix, columns]
+
         return matrix
