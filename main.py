@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 def main():
     img = ImageReader.read_image('./img/deer.bmp')
     print(img.shape)
-    f = 100
-    d = 60
+    f = 8
+    d = 7
     c = Compressor(img, f, d)
     t0 = time.time()
     compressed = c.compress()
@@ -28,6 +28,6 @@ def main():
 
 
 if __name__ == '__main__':
-    UserInterface().startUI()
-    #main()
+    #UserInterface().startUI()
+    main()
 

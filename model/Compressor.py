@@ -14,6 +14,8 @@ class Compressor:
     def compress(self):
         if self.d < 0 or self.d > 2 * self.f - 2:
             raise Exception("Parametro d non valido")
+        if self.f > self.img.shape[0] or self.f > self.img.shape[1]:
+            raise Exception("Parametro F non valido")
         if len(self.img.shape) == 2:
             return self.compressGray()
         else:
@@ -31,7 +33,7 @@ class Compressor:
             return np.stack((r, g, b), axis=2)
 
     def compressGray(self):
-        rows_deleted, columns_deleted = self.removePixels()
+        self.removePixels()
         img_size = self.img.shape
         result = np.zeros(img_size)
 
@@ -42,7 +44,7 @@ class Compressor:
                 result[i:(i + self.f), j:(j + self.f)] = self.idct2(result[i:(i + self.f), j:(j + self.f)])
                 result[i:(i + self.f), j:(j + self.f)] = self.fixValues(result[i:(i + self.f), j:(j + self.f)])
 
-        result = self.fillPixels(result.astype(int), rows_deleted, columns_deleted)
+        result = result.astype(int)
         return result
 
     def removePixels(self):
@@ -55,8 +57,6 @@ class Compressor:
             self.img = self.img[:-rows_deleted]
         if columns_deleted > 0:
             self.img = self.img[:, :-columns_deleted]
-
-        return rows_deleted, columns_deleted
 
     @staticmethod
     def dct2(a):
@@ -87,19 +87,3 @@ class Compressor:
         block[block > 254] = 255
         block[block < 1] = 0
         return block
-
-    @staticmethod
-    def fillPixels(matrix, rows_deleted, columns_deleted):
-        height, width = matrix.shape
-
-        if rows_deleted > 0:
-            row = matrix[-1:]
-            rows = np.tile(row, (rows_deleted, 1))
-            matrix = np.r_[matrix, rows]
-
-        if columns_deleted > 0:
-            column = matrix[:, width - 1:width]
-            columns = np.tile(column, (1, columns_deleted))
-            matrix = np.c_[matrix, columns]
-
-        return matrix
