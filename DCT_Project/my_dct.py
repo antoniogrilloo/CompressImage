@@ -110,6 +110,7 @@ def main():
     # m = load_matrices_from_file(n)
     times_my_dct = np.log10(measure_time(m, my_dct2))
     times_dct = np.log10(measure_time(m, dct2))
+
     pix_start = 60
     numbers = np.array([pix_start * 2 ** i for i in range(n)])
 
@@ -118,7 +119,7 @@ def main():
 
     # for legend
     color = ['red', 'green', 'blue', 'gold']
-    names = [r'$x^3$', r'$x^2 log x$', r'DCT implementata', r'DCT libreria']
+    names = [r'$x^3$', r'$x^2 \log x$', r'DCT implementata', r'DCT libreria']
 
     plt.plot(numbers, x3, color=color[0], label=names[0])
     plt.plot(numbers, x2logx, color=color[1], label=names[1])

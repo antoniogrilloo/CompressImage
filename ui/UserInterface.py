@@ -306,7 +306,6 @@ class UserInterface:
         self.root.update_idletasks()
         time.sleep(1)
 
-
         if height > width:
             new_height = 460
             new_width = width * new_height / height
@@ -374,10 +373,3 @@ class UserInterface:
         self.progressbarAfter.place_forget()
 
         self.canZoom = True
-
-
-
-
-
-
-
