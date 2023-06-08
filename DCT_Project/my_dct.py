@@ -2,7 +2,7 @@
 
 import numpy as np
 from numpy import float64
-from scipy.fftpack import dct
+from scipy.fft import dct
 import time
 import matplotlib.pyplot as plt
 
@@ -133,5 +133,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # test_dct()
-    main()
+    test_dct()
+    #main()

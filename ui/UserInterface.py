@@ -1,6 +1,5 @@
 import os
 import tkinter as tk
-import warnings
 from threading import Thread
 from tkinter import W, TRUE, FALSE, BOTH, N, E, ttk
 from tkinter import filedialog as fd

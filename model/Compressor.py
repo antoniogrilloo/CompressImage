@@ -1,6 +1,6 @@
 #! bin/python3
 from numpy import r_
-from scipy.fftpack import dct, idct
+from scipy.fft import dct, idct
 import numpy as np
 
 
