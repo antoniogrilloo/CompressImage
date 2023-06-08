@@ -1,7 +1,8 @@
 import os
-import tkinter
+import tkinter as tk
+import warnings
 from threading import Thread
-from tkinter import W, TRUE, FALSE, BOTH, N, E
+from tkinter import W, TRUE, FALSE, BOTH, N, E, ttk
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
 
@@ -13,6 +14,8 @@ from customtkinter import StringVar
 import time
 
 from model.Compressor import Compressor
+
+from ui.ZoomWindow import ZoomWindow
 
 
 class UserInterface:
@@ -54,24 +57,36 @@ class UserInterface:
         self.frame4 = customtkinter.CTkFrame(master=self.root)
         self.frame4.pack(fill=BOTH, expand=TRUE, padx=30, pady=(0, 30))
 
-        self.frame5 = customtkinter.CTkFrame(master=self.frame4, fg_color="transparent")
-        self.frame5.configure(height=480, width=506)
-        self.frame5.place(x=130, y=15)
+        self.root.update_idletasks()
 
-        self.frame6 = customtkinter.CTkFrame(master=self.frame4, fg_color="transparent")
-        self.frame6.configure(height=480, width=506)
-        self.frame6.place(x=800, y=15)
+        widthFrame = self.frame4.winfo_width()
+        heighFrame = self.frame4.winfo_height()
 
-        self.labelAnte = tkinter.Label(self.frame3)
-        self.labelBefore = tkinter.Label(self.frame5)
-        self.labelAfter = tkinter.Label(self.frame6)
+        self.frame5 = customtkinter.CTkFrame(master=self.frame4)
+        self.frame5.configure(height=480, width=widthFrame*0.35)
+        self.frame5.grid(row=1, column=1, pady=(heighFrame*0.05, 0), padx=widthFrame*0.075)
+
+        self.frame6 = customtkinter.CTkFrame(master=self.frame4)
+        self.frame6.configure(height=480, width=widthFrame*0.35)
+        self.frame6.grid(row=1, column=2, pady=(heighFrame*0.05, 0), padx=widthFrame*0.075)
+
+        self.frame7 = customtkinter.CTkFrame(master=self.frame4, fg_color="transparent")
+        self.frame7.grid(row=2, column=1)
+
+        self.frame8 = customtkinter.CTkFrame(master=self.frame4, fg_color="transparent")
+        self.frame8.grid(row=2, column=2)
+
+
+        self.labelAnte = tk.Label(self.frame3)
+        self.labelBefore = tk.Label(self.frame5)
+        self.labelAfter = tk.Label(self.frame6)
 
         self.labelTextPreview = customtkinter.CTkLabel(self.frame3, text="Image preview",
                                                        font=("calibri", 14, "bold")).place(x=50, y=0)
-        self.labelTextBefore = customtkinter.CTkLabel(self.frame4, text="Original image",
-                                                      font=("calibri", 14, "bold")).place(x=270, y=502)
-        self.labelTetxAfter = customtkinter.CTkLabel(self.frame4, text="Compressed image",
-                                                     font=("calibri", 14, "bold")).place(x=950, y=502)
+        self.labelTextBefore = customtkinter.CTkLabel(self.frame7, text="Original image   ",
+                                                      font=("calibri", 14, "bold")).grid(row=1, column=1)
+        self.labelTetxAfter = customtkinter.CTkLabel(self.frame8, text="Compressed image   ",
+                                                     font=("calibri", 14, "bold")).grid(row=1, column=1)
 
         customtkinter.CTkLabel(master=frame2, text="Image:", font=("calibri", 14, "bold")).grid(row=1, column=1,
                                                                                                 sticky=W)
@@ -89,7 +104,7 @@ class UserInterface:
         self.open_button.grid(row=1, column=2)
 
         self.zoom1_button = customtkinter.CTkButton(
-            self.frame4,
+            self.frame7,
             text='Zoom',
             command=lambda: self.zoom(1),
             width=85,
@@ -97,10 +112,10 @@ class UserInterface:
             text_color='white',
             fg_color='#555555',
             hover_color='#555555'
-        ).place(x=390, y=505)
+        ).grid(row=1, column=2)
 
         self.zoom2_button = customtkinter.CTkButton(
-            self.frame4,
+            self.frame8,
             text='Zoom',
             command=lambda: self.zoom(2),
             width=85,
@@ -108,7 +123,7 @@ class UserInterface:
             text_color='white',
             fg_color='#555555',
             hover_color='#555555'
-        ).place(x=1100, y=505)
+        ).grid(row=1, column=2)
 
         customtkinter.CTkLabel(master=frame2, text="Parameter F:   ", font=("calibri", 14, "bold")).grid(row=2,
                                                                                                          column=1,
@@ -145,45 +160,21 @@ class UserInterface:
 
         self.last_filename = ""
 
+        self.root.resizable(False, False)
         self.root.mainloop()
 
+
     def zoom(self, zoom):
+
         if self.canZoom == False:
-            tkinter.messagebox.showerror(title=None, message='There is no image to zoom!')
+            tk.messagebox.showerror(title=None, message='There is no image to zoom!')
             return
 
-        self.new_window = customtkinter.CTk()
-        self.new_window.geometry(
-            str(self.new_window.winfo_screenwidth()) + "x" + str(self.new_window.winfo_screenheight()))
-        self.new_window.title('Zoom Original Image')
-
         if zoom == 1:
-            filename = self.image.get()
-            im = Image.open(filename)
+            ZoomWindow(tk.Tk(), Image.open(self.image.get()), 1)
         else:
-            im = self.im
+            ZoomWindow(tk.Tk(), self.im, 2)
 
-        width, height = im.size
-        if height > width:
-            new_height = 800
-            new_width = width * new_height / height
-        else:
-            new_width = 800
-            new_height = height * new_width / width
-
-        resized_image = im.resize((int(new_width), int(new_height)), Image.ANTIALIAS)
-
-        test = ImageTk.PhotoImage(resized_image, master=self.new_window)
-        labelBeforeZoom = tkinter.Label(self.new_window, image=test)
-        labelBeforeZoom.image = test
-        if new_height >= new_width:
-            y = 10
-            x = (self.new_window.winfo_screenwidth() / 2) - (new_width / 2)
-        elif new_width > new_height:
-            y = 150
-            x = (self.new_window.winfo_screenwidth() / 2) - (new_width / 2)
-
-        labelBeforeZoom.place(x=x, y=y)
 
     def select_file(self):
         self.labelAnte.place_forget()
@@ -191,6 +182,9 @@ class UserInterface:
 
         filetypes = (
             ('bmp files', '*.bmp'),
+            ('png files', '*.png'),
+            ('jpeg files', '*.jpeg'),
+            ('jpg files', '*.jpg'),
             ('All files', '*.*')
         )
 
@@ -221,6 +215,8 @@ class UserInterface:
                 self.open_button.configure(text=head_tail[1])
 
             self.labelBefore.place_forget()
+            self.labelAfter.place_forget()
+
             self.canZoom = False
 
             self.progressbarPreview.place(x=50, y=110)
@@ -266,18 +262,19 @@ class UserInterface:
 
     def show_before(self):
         self.labelBefore.place_forget()
+        self.labelAfter.place_forget()
         self.root.update_idletasks()
 
         filename = self.image.get()
         if filename == '':
-            tkinter.messagebox.showerror(title=None, message='File not selected!')
+            tk.messagebox.showerror(title=None, message='File not selected!')
             return
         while True:
             try:
                 num = int(self.entry.get())
                 break
             except:
-                tkinter.messagebox.showerror(title=None, message='Parameter F not valid')
+                tk.messagebox.showerror(title=None, message='Parameter F not valid')
                 return
 
         while True:
@@ -285,8 +282,23 @@ class UserInterface:
                 num = int(self.entry2.get())
                 break
             except:
-                tkinter.messagebox.showerror(title=None, message='Parameter D not valid')
+                tk.messagebox.showerror(title=None, message='Parameter D not valid')
                 return
+
+        im = Image.open(filename)
+        width, height = im.size
+        min = 0
+        if width < height:
+            min = width
+        else:
+            min = height
+
+        if int(self.entry.get()) > min or int(self.entry.get())<0:
+            tk.messagebox.showerror(title=None, message='Parameter F not valid,  must be beetween 0 and ' + str(min))
+            return
+        if int(self.entry2.get()) < 0 or int(self.entry2.get()) >(2 * int(self.entry.get()) -2):
+            tk.messagebox.showerror(title=None, message='Parameter D not valid,  must be beetween 0 and ' + str(2 * int(self.entry.get()) -2))
+            return
 
         self.frame4.pack_propagate(False)
         self.progressbarBefore.place(x=150, y=250)
@@ -294,9 +306,7 @@ class UserInterface:
         self.root.update_idletasks()
         time.sleep(1)
 
-        im = Image.open(filename)
 
-        width, height = im.size
         if height > width:
             new_height = 460
             new_width = width * new_height / height
@@ -331,7 +341,6 @@ class UserInterface:
 
         time.sleep(1)
 
-        # da cambiare con immagine compressa
         self.im = np.asarray(Image.open(self.image.get()))
 
         c = Compressor(self.im, int(self.entry.get()), int(self.entry2.get()))
@@ -365,3 +374,10 @@ class UserInterface:
         self.progressbarAfter.place_forget()
 
         self.canZoom = True
+
+
+
+
+
+
+
