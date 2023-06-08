@@ -61,11 +61,11 @@ class UserInterface:
         widthFrame = self.frame4.winfo_width()
         heighFrame = self.frame4.winfo_height()
 
-        self.frame5 = customtkinter.CTkFrame(master=self.frame4)
+        self.frame5 = customtkinter.CTkFrame(master=self.frame4, fg_color="transparent")
         self.frame5.configure(height=480, width=widthFrame*0.35)
         self.frame5.grid(row=1, column=1, pady=(heighFrame*0.05, 0), padx=widthFrame*0.075)
 
-        self.frame6 = customtkinter.CTkFrame(master=self.frame4)
+        self.frame6 = customtkinter.CTkFrame(master=self.frame4, fg_color="transparent")
         self.frame6.configure(height=480, width=widthFrame*0.35)
         self.frame6.grid(row=1, column=2, pady=(heighFrame*0.05, 0), padx=widthFrame*0.075)
 
